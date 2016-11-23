@@ -362,6 +362,9 @@ function varargout = toggleToolbox(varargin)
     if ~restoremode
         varargout{1} = toolbox_states_out; end
 
+    % Update toolbox cache
+    rehash toolboxcache
+
 end
 
 function tb_name_map = get_tb_name_map()
