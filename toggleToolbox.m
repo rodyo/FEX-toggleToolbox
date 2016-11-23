@@ -1,4 +1,4 @@
-% TOGGLETOOLBOX      Utility to switch MATLAB toolboxes on or off.
+% TOGGLETOOLBOX              Utility to enable/disable MATLAB toolboxes.
 %
 % S = TOGGLETOOLBOX()
 % S = TOGGLETOOLBOX('')
@@ -12,8 +12,10 @@
 % MATLAB toolbox [toolbox] to [state]. The string or cellstring [toolbox] may
 % be equal to the toolbox' installation directory name (the same as used by
 % ver()), or the toolbox' full name. The string [state] may be one of 'on',
-% 'off' or 'query'. The return argument [S] is a structure containing the
-% toolbox name(s) as fields, with the on/off state represented as true/false.
+% 'enable' (equivalent), 'off' or 'disable (equivalent), or 'query'. The
+% return argument [S] is a structure containing the toolbox name(s) as
+% fields, with the on/off state represented as true/false, and the MATLAB
+% path as it was before the call.
 %
 % S = TOGGLETOOLBOX(..., permanency) for string [permanency] equal to
 % 'permanent' will attempt to make the change persist between different
@@ -205,9 +207,9 @@ function varargout = toggleToolbox(varargin)
            'strings (multiple toolboxes).']);
 
     if ~restoremode
-        assert(ischar(state) && any(strcmpi(state, {'on' 'off' 'query'})),...
+        assert(ischar(state) && any(strcmpi(state, {'on' 'enable' 'off' 'disable' 'query'})),...
                [msgId ':argument_error'],...
-               'State must be a string equal to ''on'', ''off'' or ''query''.');
+               'State must be a string equal to ''on''/''enable'', ''off''/''disable'', or ''query''.');
     end
 
     assert(ischar(permanent) && any(strcmpi(permanent, {'permanent', 'temporary'})),...
@@ -269,7 +271,7 @@ function varargout = toggleToolbox(varargin)
 
     switch lower(state)
 
-        case 'off'
+        case {'off' 'disable'}
             for ii = 1:numel(toolbox)
 
                 tb = toolbox{ii};
@@ -288,7 +290,7 @@ function varargout = toggleToolbox(varargin)
             end
 
 
-        case {'on' 'restore'}
+        case {'on' 'enable' 'restore'}
 
             switched = false;
 
