@@ -154,23 +154,19 @@ function varargout = toggleToolbox(varargin)
                 end
             end
 
-        case 2
+        case {2,3}
             % Toggle state of one or more toolboxes
             toolbox   = varargin{1};
             state     = varargin{2};
             querymode = strcmpi(state, 'query');
-
-
-        case 3
-            toolbox   = varargin{1};
-            state     = varargin{2};
-            querymode = strcmpi(state, 'query');
-
-            if ~querymode
-                permanent = varargin{3};
-            else
-                warning([msgId ':permanence_na_in_querymode'],...
-                        'Permanency flag ignored for ''query'' mode.');
+            
+            if nargin == 3
+                if ~querymode
+                    permanent = varargin{3};
+                else
+                    warning([msgId ':permanence_na_in_querymode'],...
+                            'Permanency flag ignored for ''query'' mode.');
+                end
             end
 
         otherwise
@@ -259,11 +255,6 @@ function varargout = toggleToolbox(varargin)
     end
 
 
-
-
-
-
-
     %% Toggle all requested toolboxes
     % ====================================================
 
@@ -272,6 +263,17 @@ function varargout = toggleToolbox(varargin)
     switch lower(state)
 
         case {'off' 'disable'}
+            
+            % NOTE (Rody Oldenhuis): make sure the 'MATLAB' "toolbox"
+            % is excluded, otherwise, MATLAB becomed unusable      
+            toolbox(strcmpi(toolbox, 'MATLAB')) = [];
+            if isempty(toolbox)
+                warning([msgId ':matlab_toolbox_must_stay'],...
+                        'The ''MATLAB'' toolbox can not be disabled.');
+                return;
+            end
+            
+            % Walk by all selected toolboxes and switch them off            
             for ii = 1:numel(toolbox)
 
                 tb = toolbox{ii};
@@ -283,7 +285,8 @@ function varargout = toggleToolbox(varargin)
                 else
                     % Remove whole toolbox from path
                     toolbox_states.(tb) = false;
-                    inds  = ~cellfun('isempty', strfind(paths, fullfile(matlabroot, 'toolbox', tb)));
+                    inds  = ~cellfun('isempty', ...
+                                     strfind(paths, fullfile(matlabroot, 'toolbox', tb))); %#ok<STRCL1>
                     rmpath(paths{inds});
                 end
 
@@ -338,7 +341,8 @@ function varargout = toggleToolbox(varargin)
                 for jj = 1:numel(toolboxes)
                     tb = toolboxes{jj};
                     if ~toolbox_states.(tb)
-                        inds  = ~cellfun('isempty', strfind(paths, fullfile(matlabroot, 'toolbox', tb)));
+                        inds  = ~cellfun('isempty',...
+                                         strfind(paths, fullfile(matlabroot, 'toolbox', tb))); %#ok<STRCL1>
                         rmpath(paths{inds});
                     end
                 end
@@ -398,13 +402,23 @@ function tb_name_map = get_tb_name_map()
             % ver() will not find it)
             tb_dir = fullfile(matlabroot, 'toolbox', tb_dirname);
             inds = ~cellfun('isempty', ...
-                            strfind(paths, tb_dir));
+                            strfind(paths, tb_dir)); %#ok<STRCL1>
 
             if ~any(inds)
                 addpath(genpath(tb_dir)); end
 
             % Get toolbox information via ver()
-            tb_version = ver(tb_dirname);
+            % NOTE: (Rody Oldenhuis) 'fixpoint' has been renamed to 
+            % 'fixedpoint' in an unknown MATLAB version, resulting in a
+            % warning if you use the old name. Introduce some
+            % version-specific code here: 
+            if strcmpi(tb_dirname, 'fixpoint') && ~verLessThan('matlab', '9.1')
+                % TODO: update to the first version actually giving the warning                                       
+                tb_version = ver('fixedpoint');                
+            else
+                tb_version = ver(tb_dirname);
+            end
+            
             if ~isempty(tb_version)
                 S(ii) = tb_version; end
 
