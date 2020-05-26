@@ -179,20 +179,18 @@ function varargout = toggleToolbox(varargin)
 
     % Initialize tb states structure
     if ~restoremode
-        if exist(storefile,'file')==2
-            % Load previous paths and toggle states, if any
-            S = load(storefile);
-            toolbox_states = S.toolbox_states;
-            clear S;
-        else
-            % Otherwise, just initialize it by storing the previous
-            % path strings...
+        % Load previous paths and toggle states, if any
+        toolbox_states=getpref('RodyOldenhuis',...%author name as group ID
+            ['toggleToolbox___',...%function group
+            'toolbox_states'],...%preference name
+            []);
+        if isempty(toolbox_states)
+            % Initialize it by storing the previous path strings...
             toolbox_states = struct('path', {paths});
 
             % ...and mark all toolboxes as "enabled"
             for ii = 1:size(tb_name_map,1)
                 toolbox_states.(tb_name_map{ii,1}) = true; end
-
         end
     end
 
@@ -241,8 +239,10 @@ function varargout = toggleToolbox(varargin)
     if querymode
         % ALL toolboxes
         if isempty(toolbox)
-            save(storefile, 'toolbox_states');
-            %toolbox_states = rmfield(toolbox_states, 'path');
+            setpref('RodyOldenhuis',...%author name as group ID
+                ['toggleToolbox___',...%function group
+                'toolbox_states'],...%preference name
+                toolbox_states);
             varargout{1}   = toolbox_states;
 
         % SOME toolboxes
@@ -355,7 +355,10 @@ function varargout = toggleToolbox(varargin)
     % ====================================================
 
     % Save toggle states and previous paths
-    save(storefile, 'toolbox_states');
+    setpref('RodyOldenhuis',...%author name as group ID
+        ['toggleToolbox___',...%function group
+        'toolbox_states'],...%preference name
+        toolbox_states);
 
     % Make changes permanent when requested
     switch lower(permanent)
