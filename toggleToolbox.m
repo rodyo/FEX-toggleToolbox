@@ -180,10 +180,9 @@ function varargout = toggleToolbox(varargin)
     % Initialize tb states structure
     if ~restoremode
         % Load previous paths and toggle states, if any
-        toolbox_states=getpref('RodyOldenhuis',...%author name as group ID
-            ['toggleToolbox___',...%function group
-            'toolbox_states'],...%preference name
-            []);
+        toolbox_states = getpref('toggleToolbox___',...            
+                                 'toolbox_states',...
+                                 []);
         if isempty(toolbox_states)
             % Initialize it by storing the previous path strings...
             toolbox_states = struct('path', {paths});
@@ -239,10 +238,9 @@ function varargout = toggleToolbox(varargin)
     if querymode
         % ALL toolboxes
         if isempty(toolbox)
-            setpref('RodyOldenhuis',...%author name as group ID
-                ['toggleToolbox___',...%function group
-                'toolbox_states'],...%preference name
-                toolbox_states);
+            setpref('toggleToolbox___',...
+                    'toolbox_states',...
+                    toolbox_states);
             varargout{1}   = toolbox_states;
 
         % SOME toolboxes
@@ -355,10 +353,9 @@ function varargout = toggleToolbox(varargin)
     % ====================================================
 
     % Save toggle states and previous paths
-    setpref('RodyOldenhuis',...%author name as group ID
-        ['toggleToolbox___',...%function group
-        'toolbox_states'],...%preference name
-        toolbox_states);
+    setpref('toggleToolbox___',...
+            'toolbox_states',...
+            toolbox_states);
 
     % Make changes permanent when requested
     switch lower(permanent)
