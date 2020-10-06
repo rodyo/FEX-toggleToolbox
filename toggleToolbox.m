@@ -34,10 +34,6 @@
 % order -- calling TOGGLETOOLBOX('all', 'on') afterwards results in a path
 % identical to the startup path.
 %
-% Note that TOGGLETOOLBOX() generates a MAT file for both performance and
-% permanence between MATLAB sessions. Please make sure that TOGGLETOOLBOX()
-% is located in a directory with write access.
-%
 %
 % EXAMPLE SESSION:
 %
@@ -92,10 +88,6 @@ function varargout = toggleToolbox(varargin)
 
     % Default msg ID for error/warning messages
     msgId = mfilename();
-
-    % Store toolbox states in a store file
-    storefile = fullfile(fileparts(mfilename('fullpath')), ...
-                         'toolbox_states.mat');
 
 
     % Names should be given as directory names, but who on Earth
